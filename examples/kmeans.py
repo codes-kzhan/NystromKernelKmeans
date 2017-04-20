@@ -4,16 +4,33 @@ from pyspark.sql import SparkSession
 from pyspark.ml.clustering import KMeans
 
 import numpy
+import optparse
 import time
 import sys
 import os
 from sklearn.metrics.cluster import normalized_mutual_info_score
 
-HOME_DIR = "../"
-DATA_FILE = "data/mnist"
-OUTPUT_FILE = "result/kmeans.npz"
+DATA_FILE = os.environ['DATA_FILE']
+OUTPUT_FILE = os.environ['OUTPUT_FILE']
 
-if __name__ == "__main__":
+def main():
+    parser = optparse.OptionParser()
+    parser.add_option('-k', '--cluster_num',
+                  dest="cluster_num",
+                  default=2,
+                  type="int",
+                  help="cluster number"
+                  )
+    parser.add_option('-m', '--max_iter',
+                  dest="max_iter",
+                  default=10,
+                  type="int",
+                  help="max number of iterations"
+                  )
+    options, reminder = parser.parse_args()
+    CLUSTER_NUM = options.cluster_num
+    MAX_ITER = options.max_iter
+
     
     spark = SparkSession\
         .builder\
@@ -21,10 +38,10 @@ if __name__ == "__main__":
         .getOrCreate()
     
     # Loads data as RDD of (label, feature)
-    dataset = spark.read.format("libsvm").load(HOME_DIR + DATA_FILE)
+    dataset = spark.read.format("libsvm").load(DATA_FILE)
 
     # Trains a k-means model.
-    kmeans = KMeans(k=10, seed=1, maxIter=50)
+    kmeans = KMeans(k=CLUSTER_NUM, seed=1, maxIter=MAX_ITER)
     model = kmeans.fit(dataset)
     
     # Evaluate normalized mutual information score
@@ -45,6 +62,15 @@ if __name__ == "__main__":
     print('#####################################')
     print("Within Set Sum of Squared Errors = " + str(wssse))
     
-    numpy.savez(HOME_DIR + OUTPUT_FILE, nmi, wssse)
+    numpy.savez(OUTPUT_FILE, nmi, wssse)
+    
+    
+    print('#####################################')
+    print(CLUSTER_NUM)
+    print(MAX_ITER)
     
     spark.stop()
+
+
+if __name__ == "__main__":
+    main()

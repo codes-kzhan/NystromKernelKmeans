@@ -11,7 +11,10 @@
 INPUT_DIR="$SCRATCH/NystromKernelKmeans"
 PYTHON_FILE="$INPUT_DIR/examples/kmeans.py"
 
+export DATA_FILE="$INPUT_DIR/data/mnist"
+export OUTPUT_FILE="$INPUT_DIR/result/kmeans.npz"
+
 module load spark
 start-all.sh
-spark-submit $PYTHON_FILE
+spark-submit $PYTHON_FILE -k 10
 stop-all.sh
