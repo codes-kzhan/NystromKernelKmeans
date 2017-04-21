@@ -7,12 +7,15 @@
 #SBATCH -L SCRATCH
 #SBATCH -e mysparkjob_%j.err
 #SBATCH -o mysparkjob_%j.out
-#SBATCH --ccm
 
-module load python/3.5-anaconda
 module load spark
 start-all.sh
 
-spark-submit $SPARK_EXAMPLES/python/pi.py
+
+spark-submit \
+    --master $SPARKURL \
+    --driver-memory 15G \
+    --executor-memory 20G \
+    $SPARK_EXAMPLES/python/pi.py
     
 stop-all.sh
