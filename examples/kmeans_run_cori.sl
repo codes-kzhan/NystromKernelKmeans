@@ -7,9 +7,7 @@
 #SBATCH -L SCRATCH
 #SBATCH -e mysparkjob_%j.err
 #SBATCH -o mysparkjob_%j.out
-#SBATCH --ccm
 
-MASTER=$SPARKURL
 INPUT_DIR="$SCRATCH/NystromKernelKmeans"
 PYTHON_FILE="$INPUT_DIR/examples/kmeans.py"
 
@@ -21,7 +19,9 @@ module load spark
 start-all.sh
 
 spark-submit \
-    --master $MASTER \
-    $PYTHON_FILE -k 10
+    --master $SPARKURL \
+    --driver-memory 15G \
+    --executor-memory 20G \
+    $PYTHON_FILE
     
 stop-all.sh
