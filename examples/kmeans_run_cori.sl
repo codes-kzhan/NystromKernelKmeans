@@ -20,8 +20,8 @@ start-all.sh
 
 spark-submit \
     --master $SPARKURL \
-    --driver-memory 15G \
-    --executor-memory 20G \
+    --driver-memory 2G \
+    --executor-memory 2G \
     $PYTHON_FILE
     
 stop-all.sh
